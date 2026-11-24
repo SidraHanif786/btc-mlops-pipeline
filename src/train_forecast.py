@@ -61,9 +61,7 @@ def engineer_features(
 def compute_mape(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     y_true = np.array(y_true, dtype=float)
     y_pred = np.array(y_pred, dtype=float)
-    return float(
-        np.mean(np.abs((y_true - y_pred) / np.clip(y_true, 1e-8, None))) * 100
-    )
+    return float(np.mean(np.abs((y_true - y_pred) / np.clip(y_true, 1e-8, None))) * 100)
 
 
 def train_and_evaluate(
@@ -142,9 +140,7 @@ def recursive_forecast(
         closes = [closes[0]] * (30 - len(closes)) + closes
 
     base_date = (
-        pd.to_datetime(start_date)
-        if start_date
-        else pd.Timestamp.utcnow().normalize()
+        pd.to_datetime(start_date) if start_date else pd.Timestamp.utcnow().normalize()
     )
 
     predictions = []

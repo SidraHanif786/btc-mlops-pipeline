@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: btc-forecast-api
+  labels:
+    app: btc-forecast-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: btc-forecast-api
+  template:
+    metadata:
+      labels:
+        app: btc-forecast-api
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: btc-forecast-api
+          image: ghcr.io/sidrahanif786/btc-mlops-pipeline:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: btc-api-config
+            - secretRef:
+                name: btc-api-secret
+          volumeMounts:
+            - name: models-storage
+              mountPath: /app/models
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: models-storage
+          persistentVolumeClaim:
+            claimName: btc-models-pvc

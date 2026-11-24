@@ -8,4 +8,5 @@ models/
 *.joblib
 *.csv
 .env
-airflow_logs/
+airflow_logs/.dill/
+.dill/

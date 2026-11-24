@@ -52,16 +52,15 @@ def fetch_btc_data(output_path: str = RAW_DATA_PATH) -> str:
     """Fetch BTC daily market data with automatic fallback and save to CSV."""
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     try:
-        df = fetch_from_yfinance()
-    except Exception as exc:
-        logger.warning("yfinance failed (%s); falling back to Binance API.", exc)
         df = fetch_from_binance()
+    except Exception as exc:
+        logger.warning("Binance failed (%s); falling back to yfinance.", exc)
+        df = fetch_from_yfinance()
 
     df = df.dropna().sort_values("Date").drop_duplicates(subset=["Date"])
     df.to_csv(output_path, index=False)
     logger.info("Saved %d rows to %s", len(df), output_path)
     return output_path
-
 
 if __name__ == "__main__":
     fetch_btc_data()
